@@ -1,0 +1,3 @@
+graft homesens/templates
+graft homesens/static
+include homesens/schema.sql

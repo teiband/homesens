@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block body %}
+  {% if session.logged_in %}
+    <form action="{{ url_for('add_entry') }}" method=post class=add-entry>
+      <dl>
+        <dt>Title:
+        <dd><input type=text size=30 name=temperature>
+        <dt>Text:
+        <dd><textarea name=pressure rows=5 cols=40></textarea>
+        <dd><input type=submit value=Share>
+      </dl>
+    </form>
+  {% endif %}
+  <h2>A beautiful plot</h2>
+	<img src="{{ url_for('static', filename='images/tmp_plot_collection.png') }}" width="550" height="300" title="Plot Collection" border="0">
+  <ul class=entries>
+	  <p>time | temp. | press. | humid.</p>
+  {% for entry in entries %}
+    <li>{{ entry.timestamp }} |
+		{{ "%.2f"|format(entry.temperature) }} |
+		{{ "%.2f"|format(entry.pressure) }} |
+		{{ "%.2f"|format(entry.humidity) }}
+  {% else %}
+    <li><em>Unbelievable.  No entries here so far</em>
+  {% endfor %}
+  </ul>
+{% endblock %}
