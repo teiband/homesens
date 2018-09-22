@@ -3,7 +3,7 @@ import os
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
-     
+
 # my imports
 #import plot_collection
 #import matplotlib.pyplot as pl
@@ -15,6 +15,7 @@ import time
 app = Flask(__name__) # create the application instance :)
 app.config.from_object(__name__) # load config from this file
 #app.run(host='0.0.0.0') # run puplic availabe over the network, this is unsecure!!!
+
 
 # Load default config and override config from an environment variable
 app.config.update(dict(
@@ -67,21 +68,24 @@ def UTC2CET(utc_timestamp):
 	if hour > 24:
 		hour = hour - 24
 	
-        cet_timestamp = utc_timestamp[1:-9] + str(hour) + utc_timestamp[-6:]
+	cet_timestamp = utc_timestamp[1:-9] + str(hour) + utc_timestamp[-6:]
 	return cet_timestamp
 
 @app.route('/')
 def show_entries():
-    plot_collection.blub()
-    print('after blub')
     db = get_db()
-    cur = db.execute('select timestamp, temperature, pressure, humidity from entries order by id desc')
+	# timestamp is in UTC, convert to CET
+    cur = db.execute('select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from entries order by id desc')
+    #col_names = [i[0] for i in cur.description]
+    #print col_names
     entries = cur.fetchall()
-    # timestamp is in UTC, convert to CET
-    for entry in entries:
-		entry[0] = UTC2CET(entry[0])
-    # generate plot of current data
+	# convert to list, as we cannot access timestamp column anymore
+    #entries = [entry for entry in entries]
     plot_collection.plot_mult_in_one(entries,'day')
+    
+    print entries
+    entries = entries[1:20] # show only last 20 elements
+    
     return render_template('show_entries.html', entries=entries)
     
 @app.route('/add', methods=['POST'])

@@ -4,20 +4,20 @@ import matplotlib.pyplot as plt # now we can import pyplot also headless
 import numpy as np
 import time
 
-def blub():
-    print('SUCCESS BLUB')
-
 
 TMP_FILENAME = 'homesens/static/images/tmp_plot_collection.png'
 
-# plotting #################################################
-
 def select_data_span(data, span):
 	
-	spans = [24, 24*7, 24*7*30] # available time spans for day/week/month
+	spans = np.array([24, 24*7, 24*7*30]) # available time spans for day/week/month
+	# now we have a measurement every half hour
+	spans = 2*spans
+	
 	data_span = []
 	
+	print span
 	if span == 'day':
+		print 'span', len(data)
 		if len(data) >= spans[0]:
 			data_span = (data[0:spans[0]])
 	if span == 'week':
@@ -36,24 +36,25 @@ def make_patch_spines_invisible(ax):
         sp.set_visible(False)
 
 def plot_mult_in_one(data, span):
-
 	data = select_data_span(data, span)
 	data = np.array(data)
 	data = np.flipud(data)
-	t_str = data[:,0]
-	data = data[:,1:] # remove timestamp
+	t_str = [entry[0] for entry in data]
+	#t_str = data[:,0]
+	
+	data = np.array([list(x[1:]) for x in data]) # remove timestamp
 	#t = np.tile(t0, (len(data),1))
 	
 	float_arr = np.vectorize(float)
 	data = float_arr(data)
 	#int_arr = np.vectorize(int)
 	t_hours_str = [timestamp[-8:-6] for timestamp in t_str]
-	if time.localtime().tm_isdst:
-		time_shift = 2
-	else:
-		time_shift = 1
+	#if time.localtime().tm_isdst:
+	#	time_shift = 2
+	#else:
+	#	time_shift = 1
 	
-	t_hours_str = [int(entry)+time_shift for entry in t_hours_str] # TODO database logs in UTC, but we have CET
+	#t_hours_str = [int(entry)+time_shift for entry in t_hours_str] # TODO database logs in UTC, but we have CET
 	#t_hours_str = [entry.split('.')[0] for entry in t_hours_str]
 	# TODO set t to t_hours
 	t = np.arange(len(data))
@@ -92,6 +93,12 @@ def plot_mult_in_one(data, span):
 	host.yaxis.label.set_color(p1.get_color())
 	par1.yaxis.label.set_color(p2.get_color())
 	par2.yaxis.label.set_color(p3.get_color())
+	
+	host.grid(which='both', color=[0.8, 0.8, 0.8], linestyle='-', linewidth=0.8)
+
+	host.set_ylim(15,30)
+	par1.set_ylim(950,970)
+	par2.set_ylim(30,70)
 
 	tkw = dict(size=4, width=1.5)
 	host.tick_params(axis='y', colors=p1.get_color(), **tkw)
@@ -99,8 +106,9 @@ def plot_mult_in_one(data, span):
 	par2.tick_params(axis='y', colors=p3.get_color(), **tkw)
 	host.tick_params(axis='x', **tkw)
 
-	ticks = t[0::2]
-	tick_labels = t_hours_str[0::2]
+	tick_skip = 4
+	ticks = t[0::tick_skip]
+	tick_labels = t_hours_str[0::tick_skip]
 	host.set_xticks(ticks, minor=False)
 	host.set_xticklabels(tick_labels, fontdict=None, minor=False)
 
@@ -132,4 +140,3 @@ def plot_nicely(data, span):
 
 	plt.savefig(TMP_FILENAME, bbox_inches='tight')
 	
-#############################################################

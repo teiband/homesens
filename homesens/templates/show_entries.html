@@ -13,15 +13,23 @@
   {% endif %}
   <h2>A beautiful plot</h2>
 	<img src="{{ url_for('static', filename='images/tmp_plot_collection.png') }}" width="550" height="300" title="Plot Collection" border="0">
-  <ul class=entries>
-	  <p>time | temp. | press. | humid.</p>
-  {% for entry in entries %}
-    <li>{{ entry.timestamp }} |
-		{{ "%.2f"|format(entry.temperature) }} |
-		{{ "%.2f"|format(entry.pressure) }} |
-		{{ "%.2f"|format(entry.humidity) }}
-  {% else %}
-    <li><em>Unbelievable.  No entries here so far</em>
-  {% endfor %}
-  </ul>
+  <table id=nice_table>
+	<TR>
+		<th>Time</th>
+		<th>Temp.</th>
+		<th>Press.</th>
+		<th>Humid.</th>
+	<TR>
+	{% for entry in entries %}
+	<TR>
+	   <TD class="c1">{{ entry[0] }}</TD>
+	   <TD class="c2">{{ "%.2f"|format(entry[1]) }}</TD>
+	   <TD class="c3">{{ "%.2f"|format(entry[2]) }}</TD>
+	   <TD class="c4">{{ "%.2f"|format(entry[3]) }}</TD>
+	</TR>
+	{% else %}
+    <TR>Unbelievable. No entries here so far</TR>
+	{% endfor %}
+  </table>
+	  
 {% endblock %}
