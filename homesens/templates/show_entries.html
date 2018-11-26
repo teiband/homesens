@@ -11,8 +11,15 @@
       </dl>
     </form>
   {% endif %}
-  <h2>A beautiful plot</h2>
-	<img src="{{ url_for('static', filename='images/tmp_plot_collection.png') }}" width="550" height="300" title="Plot Collection" border="0">
+  <p>Day</p>
+  <p>{{filename1}}</p>
+  <img src="{{ url_for('static', filename=plot_filenames[0] ) }}" width="550" height="350" title="Plot Collection Day" border="0">
+  <p>Week</p>
+  <img src="{{ url_for('static', filename=plot_filenames[1] ) }}" width="550" height="350" title="Plot Collection Week" border="0">
+  <p>Month</p>
+  <img src="{{ url_for('static', filename=plot_filenames[2] ) }}" width="550" height="350" title="Plot Collection Month" border="0">
+  <p>Year</p>
+  <img src="{{ url_for('static', filename=plot_filenames[3] ) }}" width="550" height="350" title="Plot Collection Year" border="0">
   <table id=nice_table>
 	<TR>
 		<th>Time</th>

@@ -2,32 +2,39 @@ import matplotlib
 matplotlib.use('Agg')  # run matplotlib headless (for virtualenv)
 import matplotlib.pyplot as plt # now we can import pyplot also headless
 import numpy as np
-import time
+import time, os
 
 
-TMP_FILENAME = 'homesens/static/images/tmp_plot_collection.png'
+TMP_FILENAME_PREFIX = 'homesens/static/images/tmp_plot_collection'
+TMP_FILENAME_EXT = '.png'
+
 
 def select_data_span(data, span):
 	
-	spans = np.array([24, 24*7, 24*7*30]) # available time spans for day/week/month
+	spans = np.array([24, 24*7, 24*30, 24*365]) # available time spans for day/week/month/year
 	# now we have a measurement every half hour
 	spans = 2*spans
 	
 	data_span = []
+	end_idx = None
 	
-	print span
+	print 'selected time span:', span
 	if span == 'day':
-		print 'span', len(data)
-		if len(data) >= spans[0]:
-			data_span = (data[0:spans[0]])
-	if span == 'week':
-		if len(data) >= spans[1]:
-			data_span = (data[0:spans[1]])
-	if span == 'month':
-		if len(data) >= spans[2]:
-			data_span = (data[0:spans[2]])
+		end_idx = spans[0]
+	elif span == 'week':
+		end_idx = spans[1]
+	elif span == 'month':
+		end_idx = spans[2]
+	elif span == 'year':
+		end_idx = spans[3]	
+	
+	if len(data) >= end_idx:
+		data_span = (data[:end_idx])
+	else:
+		data_span = data
 	
 	return data_span
+
 
 def make_patch_spines_invisible(ax):
     ax.set_frame_on(True)
@@ -38,27 +45,22 @@ def make_patch_spines_invisible(ax):
 def plot_mult_in_one(data, span):
 	data = select_data_span(data, span)
 	data = np.array(data)
-	data = np.flipud(data)
+	data = np.flipud(data) # entries come in reversed order
 	t_str = [entry[0] for entry in data]
-	#t_str = data[:,0]
+	
+	timestamps = [''.join(list(x[0])) for x in data]
 	
 	data = np.array([list(x[1:]) for x in data]) # remove timestamp
-	#t = np.tile(t0, (len(data),1))
 	
 	float_arr = np.vectorize(float)
 	data = float_arr(data)
-	#int_arr = np.vectorize(int)
 	t_hours_str = [timestamp[-8:-6] for timestamp in t_str]
 	#if time.localtime().tm_isdst:
 	#	time_shift = 2
 	#else:
 	#	time_shift = 1
-	
-	#t_hours_str = [int(entry)+time_shift for entry in t_hours_str] # TODO database logs in UTC, but we have CET
-	#t_hours_str = [entry.split('.')[0] for entry in t_hours_str]
-	# TODO set t to t_hours
+
 	t = np.arange(len(data))
-	#print(t_hours)
 
 	fig, host = plt.subplots()
 	fig.subplots_adjust(right=0.75)
@@ -96,27 +98,52 @@ def plot_mult_in_one(data, span):
 	
 	host.grid(which='both', color=[0.8, 0.8, 0.8], linestyle='-', linewidth=0.8)
 
-	host.set_ylim(15,30)
-	par1.set_ylim(950,970)
-	par2.set_ylim(30,70)
+	host.set_ylim(15,30) # temp
+	par1.set_ylim(930,970) # press
+	par2.set_ylim(30,80) # humid
 
 	tkw = dict(size=4, width=1.5)
 	host.tick_params(axis='y', colors=p1.get_color(), **tkw)
 	par1.tick_params(axis='y', colors=p2.get_color(), **tkw)
 	par2.tick_params(axis='y', colors=p3.get_color(), **tkw)
 	host.tick_params(axis='x', **tkw)
+	
+	ticks = []
+	tick_labels = []
+	if span == 'day':
+		ts = 2*2*1
+		ticks = np.arange(0,len(data),ts,dtype=int)
+		tick_labels = [entry[11:13] for entry in [timestamps[i] for i in ticks]]
+	elif span == 'week':
+		ts = 2*24
+		ticks = np.arange(0,len(data),ts,dtype=int)
+		tick_labels = [entry[:10] for entry in [timestamps[i] for i in ticks]]
+	elif span == 'month':
+		ts = 2*24*2
+		ticks = np.arange(0,len(data),ts,dtype=int)
+	 	tick_labels = [entry[:10] for entry in [timestamps[i] for i in ticks]]
+	elif span == 'year':
+		ts = 2*24*30
+		ticks = np.arange(0,len(data),ts,dtype=int)
+		tick_labels = [entry[:10] for entry in [timestamps[i] for i in ticks]]
+	
+	print len(ticks), ticks
+	print len(data)
+	print len(timestamps)
+	
+	host.set_xticks(ticks)
+	host.set_xticklabels(tick_labels, fontdict=None, rotation = 45)
 
-	tick_skip = 4
-	ticks = t[0::tick_skip]
-	tick_labels = t_hours_str[0::tick_skip]
-	host.set_xticks(ticks, minor=False)
-	host.set_xticklabels(tick_labels, fontdict=None, minor=False)
+	plt.xticks(rotation=70)
 
 	lines = [p1, p2, p3]
 
 	host.legend(lines, [l.get_label() for l in lines])
 	
-	plt.savefig(TMP_FILENAME, bbox_inches='tight')
+	filename = TMP_FILENAME_PREFIX + '_' + span + '_' + str(time.time()) + TMP_FILENAME_EXT
+	os.system('touch ' + filename)
+	os.system('chmod +777 ' + filename)
+	plt.savefig(filename, bbox_inches='tight')
 
 
 def plot_nicely(data, span):
@@ -130,8 +157,6 @@ def plot_nicely(data, span):
 	float_arr = np.vectorize(float)
 	data_num = float_arr(data)
 	
-	#print(t)
-	#print('tttttttttttttttttttttttttttt')
 	plt.plot(data_num)
 	plt.title('Data collection for last ' + span)
 	plt.xlabel('time')

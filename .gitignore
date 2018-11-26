@@ -102,3 +102,4 @@ ENV/
 
 *.pyc
 *.db
+*.png
