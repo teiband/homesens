@@ -2,7 +2,7 @@
 The framework consists of two modules:
 * bme280
     * sensor data acquisition with bme280 sensor chip
-    * repository
+    * https://github.com/teiband/bme280
 * homesens
     * web application based on Flask
     * this repository
