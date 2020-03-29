@@ -11,36 +11,36 @@ The framework consists of two modules:
 Sensor data is acquired periodically based on a linux cron-job. The acquired data is written into a **sqlite3** database. The cron-job assures that sensor data is always captured independent of the functionality of the web application.
 
 ### Cron configuration
-This config (edit by "crontab -e") calls the sensor script every 30 minutes:
+This config (edit by `crontab -e`) calls the sensor script every 30 minutes:
 
-ˋˋˋ
+```
 */30 * * * * /home/pi/workspace/bme280/send_mail_on_error.bash
-ˋˋˋ
+```
 
 ### Sensor Configuration
 TODO
 
 ## The Web Application
-The project based on python2.7 is stored in ˋ/home/pi/workspace/homesensˋ. It is configured as Flask app with the main script in
-ˋhomesens/homesens.pyˋ
+The project based on python2.7 is stored in `/home/pi/workspace/homesens`. It is configured as Flask app with the main script in
+`homesens/homesens.py`
 
 
 ### Startup
 Can be started manually with the script in
-ˋ./homesensˋ / ˋstart_flask_public.shˋ or ˋstart_with_python2.7_public.shˋ
+`./homesens` / `start_flask_public.sh` or `start_with_python2.7_public.sh`
 
 ## Webserver
 The webserver is an Apache2 server. It can be controlled with
-ˋˋˋ
+```
 sudo service apache2 start/stop/restart
-ˋˋˋ
+```
 ### Configuration
 
 ## WSGI Configuration
 WSGI [(Web Server Gateway Interface)](https://en.m.wikipedia.org/wiki/Web_Server_Gateway_Interface) builds the connection between python application and web server.
-The config file of the WSGI application need to be stored under ˋ/etc/apache2/sites-enabled/homesens.confˋ
+The config file of the WSGI application need to be stored under `/etc/apache2/sites-enabled/homesens.conf`
 
-ˋˋˋ xml
+```apache
 <virtualhost *:80>
         ServerName homesens
 
@@ -67,11 +67,11 @@ The config file of the WSGI application need to be stored under ˋ/etc/apache2/s
                 </IfVersion>
         </Directory>
 </virtualhost>
-ˋˋˋ
+```
 
 ## Requirements
 
-ˋˋˋ
+```
 apache2
 flask
-ˋˋˋ
+```
