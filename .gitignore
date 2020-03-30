@@ -103,3 +103,4 @@ ENV/
 *.pyc
 *.db
 *.png
+.pytest_cache
