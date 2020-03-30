@@ -3,7 +3,7 @@ matplotlib.use('Agg')  # run matplotlib headless (for virtualenv)
 import matplotlib.pyplot as plt # now we can import pyplot also headless
 import numpy as np
 import time, os
-
+import pickle
 
 TMP_FILENAME_PREFIX = 'homesens/static/images/tmp_plot_collection'
 TMP_FILENAME_EXT = '.png'
@@ -77,7 +77,20 @@ def plot_mult_in_one(data, span):
 	make_patch_spines_invisible(par2)
 	# Second, show the right spine.
 	par2.spines["right"].set_visible(True)
-
+	
+	if span == 'year':
+		print("Smoothing data...")
+		data_smoothed = np.zeros(data.shape)
+		N = 2*24*14 # 2: twice per hour, 24 hours, 14 days = two week moving average: no of smoothing window samples
+		data_smoothed = []
+		for d in range(0, data.shape[1]):
+			data_smoothed.append(np.convolve(data[:,d], np.ones((N,))/N, mode='valid'))
+		# append start values before smoothed values to obtain same length again
+		new_data = np.array(data_smoothed).T
+		ext_data = np.repeat(new_data[0,:].reshape(1,-1), N-1, axis=0)
+		data = np.vstack((ext_data, new_data))
+		
+		
 	p1, = host.plot(t, data[:,0], "b-", label="Temp. (degree C)")
 	p2, = par1.plot(t, data[:,1], "r-", label="Press. (hPa)")
 	p3, = par2.plot(t, data[:,2], "g-", label="Humid. (% rel.)")
