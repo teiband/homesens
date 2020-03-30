@@ -79,28 +79,23 @@ def show_entries():
     #col_names = [i[0] for i in cur.description]
     #print col_names
     entries = cur.fetchall()
-	# convert to list, as we cannot access timestamp column anymore
-    #entries = [entry for entry in entries]
     
     os.system('rm ' + plot_collection.TMP_FILENAME_PREFIX + '*') # delete old files
     #os.system('chmod +777 ./' + plot_collection.TMP_FILENAME_PREFIX + '*')
     
-    plot_collection.plot_mult_in_one(entries,'day')
-    plot_collection.plot_mult_in_one(entries,'week')
-    plot_collection.plot_mult_in_one(entries,'month')
-    plot_collection.plot_mult_in_one(entries,'year')
+    spans = ['day', 'week', 'month', 'year']
+    for span in spans:
+		plot_collection.plot_mult_in_one(entries, span)
     
     plot_filenames_unsorted = [filename for filename in os.listdir('homesens/static/images') if filename.startswith('tmp_plot_collection')]
     #print os.getcwd()
     #print os.listdir('homesens/static/images')
     plot_filenames = []
-    plot_filenames.append( 'images/' + [f for f in plot_filenames_unsorted if 'day' in f][0] )
-    plot_filenames.append( 'images/' + [f for f in plot_filenames_unsorted if 'week' in f][0] ) 
-    plot_filenames.append( 'images/' + [f for f in plot_filenames_unsorted if 'month' in f][0] )
-    plot_filenames.append( 'images/' + [f for f in plot_filenames_unsorted if 'year' in f][0] )
     
-    entries = entries[1:20] # show only last 20 elements
+    for span in spans:
+		plot_filenames.append( 'images/' + [f for f in plot_filenames_unsorted if span in f][0] )
     
+    entries = entries[1:20] # show only last 20 elements in table
     
     return render_template('show_entries.html', entries=entries, plot_filenames=plot_filenames)
     
