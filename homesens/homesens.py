@@ -80,6 +80,7 @@ def show_entries():
 
 	plot_filenames_unsorted = [filename for filename in os.listdir('homesens/static/images') if filename.startswith('tmp_plot_collection')]
 	plot_filenames = []
+	spans = ['day', 'week', 'month', 'year']
 	for span in spans:
 		plot_filenames.append( 'images/' + [f for f in plot_filenames_unsorted if span in f][0] )
 	
