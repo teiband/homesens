@@ -18,7 +18,7 @@ def select_data_span(data, span):
 	data_span = []
 	end_idx = None
 	
-	print 'selected time span:', span
+	# print 'selected time span:', span
 	if span == 'day':
 		end_idx = spans[0]
 	elif span == 'week':
@@ -79,7 +79,7 @@ def plot_mult_in_one(data, span):
 	par2.spines["right"].set_visible(True)
 	
 	if span == 'year':
-		print("Smoothing data...")
+		# print("Smoothing data...")
 		data_smoothed = np.zeros(data.shape)
 		N = 2*24*14 # 2: twice per hour, 24 hours, 14 days = two week moving average: no of smoothing window samples
 		data_smoothed = []
@@ -140,9 +140,9 @@ def plot_mult_in_one(data, span):
 		ticks = np.arange(0,len(data),ts,dtype=int)
 		tick_labels = [entry[:10] for entry in [timestamps[i] for i in ticks]]
 	
-	print len(ticks), ticks
-	print len(data)
-	print len(timestamps)
+	#print len(ticks), ticks
+	#print len(data)
+	#print len(timestamps)
 	
 	host.set_xticks(ticks)
 	host.set_xticklabels(tick_labels, fontdict=None, rotation = 45)

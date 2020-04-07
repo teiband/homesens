@@ -104,3 +104,4 @@ ENV/
 *.db
 *.png
 .pytest_cache
+start_devel.sh
