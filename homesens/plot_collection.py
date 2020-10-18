@@ -26,7 +26,7 @@ def select_data_span(data, span):
 	elif span == 'month':
 		end_idx = spans[2]
 	elif span == 'year':
-		end_idx = spans[3]	
+		end_idx = spans[3]  
 	
 	if len(data) >= end_idx:
 		data_span = (data[:end_idx])
@@ -37,10 +37,10 @@ def select_data_span(data, span):
 
 
 def make_patch_spines_invisible(ax):
-    ax.set_frame_on(True)
-    ax.patch.set_visible(False)
-    for sp in ax.spines.values():
-        sp.set_visible(False)
+	ax.set_frame_on(True)
+	ax.patch.set_visible(False)
+	for sp in ax.spines.values():
+		sp.set_visible(False)
 
 def plot_mult_in_one(data, span):
 	data = select_data_span(data, span)
@@ -56,9 +56,9 @@ def plot_mult_in_one(data, span):
 	data = float_arr(data)
 	t_hours_str = [timestamp[-8:-6] for timestamp in t_str]
 	#if time.localtime().tm_isdst:
-	#	time_shift = 2
+	#   time_shift = 2
 	#else:
-	#	time_shift = 1
+	#   time_shift = 1
 
 	t = np.arange(len(data))
 
@@ -134,7 +134,7 @@ def plot_mult_in_one(data, span):
 	elif span == 'month':
 		ts = 2*24*2
 		ticks = np.arange(0,len(data),ts,dtype=int)
-	 	tick_labels = [entry[:10] for entry in [timestamps[i] for i in ticks]]
+		tick_labels = [entry[:10] for entry in [timestamps[i] for i in ticks]]
 	elif span == 'year':
 		ts = 2*24*30
 		ticks = np.arange(0,len(data),ts,dtype=int)

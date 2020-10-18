@@ -137,7 +137,7 @@ def create_plots(spans):
 	entries = entries[1:20] # show only last 20 elements in table
 
 def create_plots_routine(spans):
-	print "Started 'create_plots_routine'"
+	print("Started 'create_plots_routine'")
 	while True:
 		create_plots(spans)
 		time.sleep(60*5) # 5 minutes

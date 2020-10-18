@@ -25,7 +25,7 @@ def test_sqlite_query():
 	try:
 		os.system('rm ' + plot_collection.TMP_FILENAME_PREFIX + '*') # delete old files
 	except:
-		print "no files to delete"
+		print("no files to delete")
 	
 	
 def test_plot_collection(db_entries):
