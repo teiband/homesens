@@ -1,0 +1,4 @@
+# For production
+sudo apt-get install sqlite3
+# For development
+sudo apt-get install sqlitebrowser
