@@ -1,13 +1,13 @@
 import os
 #os.environ['PYTHONPATH'] = '$PYTHONPATH:/home/pi/workspace/homesens-devel/'
 os.chdir('../')
-from homesens.plot_collection import *
+import homesens.plot_collection as plot_collection
 import pickle
 from homesens.homesens import *
 import pytest
 
 
-@pytest.fixture()
+@pytest.fixture
 def db_entries():
 	with app.app_context():
 		db = get_db()

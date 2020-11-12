@@ -2,7 +2,7 @@ import os
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
 	 render_template, flash
-import plot_collection
+import homesens.plot_collection as plot_collection
 import time
 from multiprocessing import Process # create plots in background
 
@@ -82,10 +82,12 @@ def show_entries():
 	plot_filenames = []
 	spans = ['day', 'week', 'month', 'year']
 	for span in spans:
-		plot_filenames.append( 'images/' + [f for f in plot_filenames_unsorted if span in f][0] )
+		if plot_filenames_unsorted:
+			plot_filenames.append( 'images/' + [f for f in plot_filenames_unsorted if span in f][0] )
 	
 	return render_template('show_entries.html', entries=entries, plot_filenames=plot_filenames)
-	
+
+
 @app.route('/add', methods=['POST'])
 def add_entry():
 	if not session.get('logged_in'):
@@ -148,4 +150,4 @@ def spawn_background_threads():
 	plot_background_process.start()
 	#plot_background_process.join()
 
-spawn_background_threads()
+#spawn_background_threads()

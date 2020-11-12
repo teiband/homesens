@@ -17,7 +17,7 @@ def select_data_span(data, span):
 	
 	data_span = []
 	end_idx = None
-	
+
 	# print 'selected time span:', span
 	if span == 'day':
 		end_idx = spans[0]
