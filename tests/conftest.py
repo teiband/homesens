@@ -12,7 +12,9 @@ def client():
 
     with homesens.app.test_client() as client:
         with homesens.app.app_context():
-            homesens.init_db()
+            pass
+            # use existing db for now
+            #homesens.init_db() # this deletes the whole db !!!
         yield client
 
 	# os.close(db_fd)
