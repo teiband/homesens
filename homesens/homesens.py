@@ -23,7 +23,7 @@ app.config.update(dict(
     SECRET_KEY='development key',
     USERNAME='admin',
     PASSWORD='default',
-    PLOT_CYLCE_TIME=30*30
+    PLOT_CYCLE_TIME=30*30
 ))
 app.config.from_envvar('HOMESENS_SETTINGS', silent=True)
 
@@ -165,17 +165,13 @@ def create_plots_routine(spans, interval, html_figs):
         time.sleep(interval)
 
 
-# print(html_figs)
-
 
 def spawn_background_threads(html_figs):
     spans = ['day', 'week', 'month', 'year']
-    interval = app.config['PLOT_CYCLE_TIME']
+    interval = float(app.config['PLOT_CYCLE_TIME'])
     plot_background_process = Process(target=create_plots_routine, args=(spans, interval, html_figs))
     plot_background_process.start()
-
-
-# plot_background_process.join()
+    # plot_background_process.join()
 
 
 background_plot_manager = Manager()
