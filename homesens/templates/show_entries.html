@@ -1,3 +1,25 @@
+<head>
+<script>
+//document.getElementById("spans").onchange = function() {selectSpan()};
+
+function selectSpan() {
+  const spans = ['day', 'week', 'month', 'year'];
+  for (var i = 0; i < spans.length; i++)
+  {
+    console.log(spans[i]);
+    elem = document.getElementById(spans[i]);
+    console.log(elem);
+    elem.hidden = true;
+  }
+  var x = document.getElementById("spans");
+  span = x.value;
+  console.log(span)
+  var elem = document.getElementById(span);
+  elem.hidden = false;
+}
+</script>
+</head>
+
 {% extends "layout.html" %}
 {% block body %}
   {% if session.logged_in %}
@@ -11,15 +33,41 @@
       </dl>
     </form>
   {% endif %}
-  <p>Day</p>
-  <p>{{filename1}}</p>
-  <img src="{{ url_for('static', filename=plot_filenames[0] ) }}" width="550" height="350" title="Plot Collection Day" border="0">
-  <p>Week</p>
-  <img src="{{ url_for('static', filename=plot_filenames[1] ) }}" width="550" height="350" title="Plot Collection Week" border="0">
-  <p>Month</p>
-  <img src="{{ url_for('static', filename=plot_filenames[2] ) }}" width="550" height="350" title="Plot Collection Month" border="0">
-  <p>Year</p>
-  <img src="{{ url_for('static', filename=plot_filenames[3] ) }}" width="550" height="350" title="Plot Collection Year" border="0">
+
+ <label for="spans">Choose a time-span:</label>
+
+    <select name="spans" id="spans" onchange="selectSpan()">
+      <option value="day">Day</option>
+      <option value="week">Week</option>
+      <option value="month">Month</option>
+      <option value="year">Year</option>
+    </select>
+
+<div id="day">
+    <p>Day</p>
+    {{ html_figs['day']['temp'] | safe }}
+    {{ html_figs['day']['press'] | safe }}
+    {{ html_figs['day']['humid'] | safe }}
+</div>
+<div id="week" display="none" hidden="true">
+    <p>Week</p>
+    {{ html_figs['week']['temp'] | safe }}
+    {{ html_figs['week']['press'] | safe }}
+    {{ html_figs['week']['humid'] | safe }}
+</div>
+<div id="month" hidden="true">
+    <p>Month</p>
+    {{ html_figs['month']['temp'] | safe }}
+    {{ html_figs['month']['press'] | safe }}
+    {{ html_figs['month']['humid'] | safe }}
+</div>
+<div id="year" hidden="true">
+    <p>Year</p>
+    {{ html_figs['year']['temp'] | safe }}
+    {{ html_figs['year']['press'] | safe }}
+    {{ html_figs['year']['humid'] | safe }}
+
+</div>
   <table id=nice_table>
 	<TR>
 		<th>Time</th>
