@@ -1,4 +1,5 @@
 import pytest
+import os
 from homesens.homesens import create_plots, show_entries, get_db, app, connect_db
 
 
@@ -12,4 +13,10 @@ def test_db(client):
         entries = cur.fetchmany(20)
         print(entries)
 
-#create_plots()
+
+def test_create_plots():
+    create_plots(['day'])
+
+os.chdir('../.')
+
+test_create_plots()
