@@ -1,1 +1,1 @@
-from .homesens import app
+from .homesens import app, create_app

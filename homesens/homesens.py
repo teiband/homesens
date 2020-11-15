@@ -11,9 +11,12 @@ import homesens.plot_collection as plot_collection
 from homesens.utils import *
 
 
-app = Flask(__name__)  # create the application instance :)
+def create_app():
+    return Flask(__name__)
+
+app = create_app()
 app.config.from_object(__name__)  # load config from this file
-# app.run(host='0.0.0.0') # run puplic availabe over the network, this is unsecure!!!
+# app.run(host='0.0.0.s0') # run puplic availabe over the network, this is unsecure!!!
 
 plot_background_process = None  # This process is created later and shut down when the app crashes
 
@@ -83,7 +86,7 @@ def UTC2CET(utc_timestamp):
 
 
 @app.route('/')
-def show_entries():
+def index():
     db = get_db()
     # timestamp is in UTC, convert to CET
     cur = db.execute(
