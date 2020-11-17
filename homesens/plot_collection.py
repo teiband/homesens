@@ -5,7 +5,7 @@ import numpy as np
 import plotly.graph_objects as go
 import pandas
 
-from .utils import *
+from utils import *
 
 
 # TMP_FILENAME_PREFIX = 'homesens/static/images/tmp_plot_collection'

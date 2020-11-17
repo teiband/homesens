@@ -7,14 +7,17 @@ from multiprocessing import Process, Manager  # create plots in background
 from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash
 
-import homesens.plot_collection as plot_collection
-from homesens.utils import *
+from plot_collection import *
+from utils import *
 
 
 def create_app():
     return Flask(__name__)
 
-app = create_app()
+#app = create_app()
+
+app = Flask(__name__)
+
 app.config.from_object(__name__)  # load config from this file
 # app.run(host='0.0.0.s0') # run puplic availabe over the network, this is unsecure!!!
 
@@ -149,7 +152,7 @@ def create_plots(spans, html_figs):
 
     for span in spans:
         # DEBUG("assign html_figs to span")
-        html_figs[span] = deepcopy(plot_collection.plot_plotly(entries, span))
+        html_figs[span] = deepcopy(plot_plotly(entries, span))
 
 
 # html_figs[span] = 1
