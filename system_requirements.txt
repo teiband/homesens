@@ -1,4 +1,5 @@
 # For production
 sudo apt-get install sqlite3
+sudo apt-get install libatlas-base-dev
 # For development
 sudo apt-get install sqlitebrowser
