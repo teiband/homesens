@@ -171,7 +171,6 @@ def create_plots_routine(spans, interval, html_figs):
         time.sleep(interval)
 
 
-
 def spawn_background_threads(html_figs):
     spans = ['day', 'week', 'month', 'year']
     interval = float(app.config['PLOT_CYCLE_TIME'])
