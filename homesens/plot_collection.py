@@ -66,6 +66,8 @@ def plot_plotly(data, span):
         fig.add_trace(go.Scatter(x=ref_values[0], y=ref_values[1], name='ref.', line_color='grey'))  # fill to trace0 y
         fig.add_trace(go.Scatter(x=df.index, y=content, fill='tonexty', name=content.label))
         # fig.show()
-        html_fig[label] = fig.to_html()
-
+        html_fig[label] = fig.to_html(include_plotlyjs=False)
+        #with open('debug.html', 'w') as f:
+        #    f.write(html_fig[label])
+    DEBUG("html figure size (Mb): " + str(len(html_fig[label])*16/1024**2))
     return html_fig
