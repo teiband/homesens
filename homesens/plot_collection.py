@@ -83,7 +83,7 @@ def plot_plotly(data, span):
 def set_plotly_fig_style(fig):
     fig.update_layout(
         autosize=False,
-        # width=800,
+        width=800,
         height=300,
         margin=dict(
             l=0,
