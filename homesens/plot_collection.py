@@ -4,6 +4,7 @@ matplotlib.use('Agg')  # run matplotlib headless (for virtualenv)
 import numpy as np
 import plotly.graph_objects as go
 import pandas
+import base64
 
 from utils import *
 
@@ -65,9 +66,48 @@ def plot_plotly(data, span):
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=ref_values[0], y=ref_values[1], name='ref.', line_color='grey'))  # fill to trace0 y
         fig.add_trace(go.Scatter(x=df.index, y=content, fill='tonexty', name=content.label))
+        set_plotly_fig_style(fig)
         # fig.show()
         html_fig[label] = fig.to_html(include_plotlyjs=False)
-        #with open('debug.html', 'w') as f:
+        # with open('debug.html', 'w') as f:
         #    f.write(html_fig[label])
-    DEBUG("html figure size (Mb): " + str(len(html_fig[label])*16/1024**2))
+        # The following could reduce plot size compared to plotly html strings:
+        # img = io.BytesIO()
+        # fig.write_image(img)
+        # base64_str = fig_to_base64(img)
+        # html_fig[label] = base64_to_html_fig(base64_str)
+    DEBUG("html figure size (Mb): " + str(len(html_fig[label]) * 16 / 1024 ** 2))
     return html_fig
+
+
+def set_plotly_fig_style(fig):
+    fig.update_layout(
+        autosize=False,
+        # width=800,
+        height=300,
+        margin=dict(
+            l=0,
+            r=0,
+            b=50,
+            t=50,
+            pad=4
+        ),
+        # paper_bgcolor="LightSteelBlue",
+    )
+
+
+def fig_to_base64(img):
+    """
+    Converts a figure to a base64 string
+    :param: img: file descriptor/ byte stream of a png file
+    """
+    img.seek(0)
+    base64_str = base64.b64encode(img.getvalue()).decode()
+    return base64_str
+
+
+def base64_to_html_fig(base64_str):
+    """
+    Returns a html image tag from a base64 string
+    """
+    return '<img src="data:image/png;base64,{}">'.format(base64_str)
