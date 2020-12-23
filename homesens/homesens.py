@@ -6,6 +6,7 @@ from multiprocessing import Process, Manager  # create plots in background
 
 from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash
+from flask_socketio import SocketIO, send, emit
 
 from plot_collection import *
 from utils import *
@@ -26,12 +27,23 @@ plot_background_process = None  # This process is created later and shut down wh
 # Load default config and override config from an environment variable
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'homesens.db'),
-    SECRET_KEY='development key',
+    SECRET_KEY='development-key',
     USERNAME='admin',
     PASSWORD='default',
     PLOT_CYCLE_TIME=30*30
 ))
 app.config.from_envvar('HOMESENS_SETTINGS', silent=True)
+
+socketio = SocketIO(app)
+
+if __name__ == "__main__":
+    socketio.run(app)
+
+
+@socketio.on('message')
+def handle_message(data):
+    print('received message: ' + data)
+    send("greetings from homesens")
 
 
 def connect_db():
