@@ -1,4 +1,4 @@
-.open homesens.db
-CREATE TABLE "homesens-extension-esp32-1" ( id integer primary key autoincrement, temperature float not null, pressure float not null, humidity float not null, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP not null );
-.save homesens.db
-.exit
+$ sqlite3 homesens.db
+
+sqlite> CREATE TABLE "homesens-extension-esp32-1" ( id integer primary key autoincrement, temperature float not null, pressure float not null, humidity float not null, Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP not null );
+sqlite> .exit
