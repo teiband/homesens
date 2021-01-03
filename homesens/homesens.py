@@ -3,6 +3,7 @@ import sqlite3
 import time
 from copy import deepcopy
 from multiprocessing import Process, Manager  # create plots in background
+import user_defines
 
 from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash, jsonify
@@ -122,7 +123,8 @@ def index():
 @app.route('/add-measurement', methods=['POST'])
 def add_measurement():
     DEBUG(request.json)
-
+    if request.json['api_key'] != user_defines.EXTENSION_API_KEY:
+        return 'ERR_INVALID_API_KEY'
     db = get_db()
     #db.execute('insert into entries (title, text) values (?, ?)',
     #           [request.form['title'], request.form['text']])
@@ -133,8 +135,10 @@ def add_measurement():
 @app.route('/get-status-update', methods=['GET'])
 def get_updated_status():
     DEBUG(request.json)
+    if request.json['api_key'] != user_defines.EXTENSION_API_KEY:
+        return 'ERR_INVALID_API_KEY'
     status = jsonify(command_1=1.0, command_2=2.0)
-    DEBUG('status: ', request.json)
+    DEBUG('status: ' + str(status.data))
     return status
 
 

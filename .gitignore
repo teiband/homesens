@@ -106,3 +106,6 @@ ENV/
 .pytest_cache
 start_devel.sh
 Pipfile.lock
+
+# homesens
+homesens/user_defines.py
