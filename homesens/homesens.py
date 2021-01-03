@@ -5,8 +5,8 @@ from copy import deepcopy
 from multiprocessing import Process, Manager  # create plots in background
 
 from flask import Flask, request, session, g, redirect, url_for, abort, \
-    render_template, flash
-from flask_socketio import SocketIO, send, emit
+    render_template, flash, jsonify
+# from flask_socketio import SocketIO, send, emit
 
 from plot_collection import *
 from utils import *
@@ -34,16 +34,15 @@ app.config.update(dict(
 ))
 app.config.from_envvar('HOMESENS_SETTINGS', silent=True)
 
-socketio = SocketIO(app)
+#socketio = SocketIO(app)
+#if __name__ == "__main__":
+    #socketio.run(app)
 
-if __name__ == "__main__":
-    socketio.run(app)
 
-
-@socketio.on('message')
-def handle_message(data):
-    print('received message: ' + data)
-    send("greetings from homesens")
+#@socketio.on('message')
+#def handle_message(data):
+#    print('received message: ' + data)
+#    send("greetings from homesens")
 
 
 def connect_db():
@@ -118,6 +117,25 @@ def index():
     # DEBUG(html_figs)
     # print(namespace.html_figs)
     return render_template('show_entries.html', entries=entries, html_figs=namespace.html_figs)
+
+
+@app.route('/add-measurement', methods=['POST'])
+def add_measurement():
+    DEBUG(request.json)
+
+    db = get_db()
+    #db.execute('insert into entries (title, text) values (?, ?)',
+    #           [request.form['title'], request.form['text']])
+    #db.commit()
+    return 'OK'
+
+
+@app.route('/get-status-update', methods=['GET'])
+def get_updated_status():
+    DEBUG(request.json)
+    status = jsonify(command_1=1.0, command_2=2.0)
+    DEBUG('status: ', request.json)
+    return status
 
 
 @app.route('/add', methods=['POST'])
