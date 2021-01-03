@@ -120,7 +120,7 @@ def index():
     return render_template('show_entries.html', entries=entries, html_figs=namespace.html_figs)
 
 
-@app.route('/add-measurement', methods=['POST'])
+@app.route('/post-measurement', methods=['POST'])
 def add_measurement():
     DEBUG(request.json)
     if request.json['api_key'] != user_defines.EXTENSION_API_KEY:
@@ -134,11 +134,11 @@ def add_measurement():
 
 @app.route('/get-status-update', methods=['GET'])
 def get_updated_status():
-    DEBUG(request.json)
-    if request.json['api_key'] != user_defines.EXTENSION_API_KEY:
+    DEBUG("request params: " + str(request.args))
+    if request.args.get('api_key') != user_defines.EXTENSION_API_KEY:
         return 'ERR_INVALID_API_KEY'
     status = jsonify(command_1=1.0, command_2=2.0)
-    DEBUG('status: ' + str(status.data))
+    DEBUG('response: ' + str(status.data))
     return status
 
 
