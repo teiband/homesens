@@ -77,7 +77,9 @@ function selectSpan() {
     {{ html_figs['year']['humid'] | safe }}
 
 </div>
-  <table id=nice_table>
+  <p></p>
+  <h2>Homesens Main Station</h2>
+  <table id=nice_table_1 class="nice_table">
 	<TR>
 		<th>Time</th>
 		<th>Temp.</th>
@@ -85,6 +87,27 @@ function selectSpan() {
 		<th>Humid.</th>
 	<TR>
 	{% for entry in entries %}
+	<TR>
+	   <TD class="c1">{{ entry[0] }}</TD>
+	   <TD class="c2">{{ "%.2f"|format(entry[1]) }}</TD>
+	   <TD class="c3">{{ "%.2f"|format(entry[2]) }}</TD>
+	   <TD class="c4">{{ "%.2f"|format(entry[3]) }}</TD>
+	</TR>
+	{% else %}
+    <TR>Unbelievable. No entries here so far</TR>
+	{% endfor %}
+  </table>
+
+  <p></p>
+  <h2>ESP32-1 BME280</h2>
+  <table id=nice_table_2 class="nice_table">
+	<TR>
+		<th>Time</th>
+		<th>Temp.</th>
+		<th>Press.</th>
+		<th>Humid.</th>
+	<TR>
+	{% for entry in esp_32_1_entries %}
 	<TR>
 	   <TD class="c1">{{ entry[0] }}</TD>
 	   <TD class="c2">{{ "%.2f"|format(entry[1]) }}</TD>

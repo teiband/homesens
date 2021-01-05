@@ -2,6 +2,7 @@ import os
 import sqlite3
 import time
 from copy import deepcopy
+import datetime
 from multiprocessing import Process, Manager  # create plots in background
 import user_defines
 
@@ -105,19 +106,18 @@ def index():
     db = get_db()
     # timestamp is in UTC, convert to CET
     cur = db.execute(
-        'select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from entries order by id desc')
+        "select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from entries order by id desc")
     entries = cur.fetchmany(20)
     spans = ['day', 'week', 'month', 'year']
 
-    # if not 'day' in namespace.html_figs.keys():
-    #	create_plots(['day'], namespace.html_figs)
-    # with open('debug.html', 'w') as f:
-    #	f.write(html_figs['day'])
+    cur = db.execute(
+        "select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from 'homesens-extension-esp32-1' order by id desc")
+    esp_32_1_entries = cur.fetchmany(20)
 
     DEBUG("Content of html_figs " + str(namespace.html_figs.keys()))
     # DEBUG(html_figs)
     # print(namespace.html_figs)
-    return render_template('show_entries.html', entries=entries, html_figs=namespace.html_figs)
+    return render_template('show_entries.html', entries=entries, html_figs=namespace.html_figs, esp_32_1_entries=esp_32_1_entries)
 
 
 @app.route('/post-measurement', methods=['POST'])
@@ -125,20 +125,35 @@ def add_measurement():
     DEBUG(request.json)
     if request.json['api_key'] != user_defines.EXTENSION_API_KEY:
         return 'ERR_INVALID_API_KEY'
-    db = get_db()
-    #db.execute('insert into entries (title, text) values (?, ?)',
-    #           [request.form['title'], request.form['text']])
-    #db.commit()
+    # insert value only every half an hour to db
+    now = datetime.datetime.now()
+    if (now.minute == 0 or now.minute > 30) and (now.second > 55.0 or now.second <= 5.0):
+        DEBUG("posting values to db...")
+        db = get_db()
+        temperature = float(request.json['temperature'])
+        pressure = float(request.json['pressure'])
+        humidity = float(request.json['humidity'])
+        insert_measurement_into_db(db, "'homesens-extension-esp32-1'", temperature, pressure, humidity)
+    else:
+        DEBUG("ignoring measurements " + str(now) + str(now.second))
     return 'OK'
+
+
+def insert_measurement_into_db(db, table_name, temperature, pressure, humidity):
+    db.execute('insert into {table_name} (temperature, pressure, humidity) values (?, ?, ?)'.format(table_name=table_name),
+                 [temperature, pressure, humidity])
+    db.commit()
+    print('New entry was successfully posted\n'
+		'values are (temp, press, humid): %.2f, %.2f, %.2f' % (temperature, pressure, humidity))
 
 
 @app.route('/get-status-update', methods=['GET'])
 def get_updated_status():
-    DEBUG("request params: " + str(request.args))
+    #DEBUG("request params: " + str(request.args))
     if request.args.get('api_key') != user_defines.EXTENSION_API_KEY:
         return 'ERR_INVALID_API_KEY'
     status = jsonify(command_1=1.0, command_2=2.0)
-    DEBUG('response: ' + str(status.data))
+    #DEBUG('response: ' + str(status.data))
     return status
 
 
@@ -182,7 +197,7 @@ def create_plots(spans, html_figs):
         # timestamp is in UTC, convert to CET
         cur = db.execute(
             'select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from entries order by id desc')
-        entries = cur.fetchall()
+        entries = cur.fetchall() # TODO fetch only max 1 year back
 
     for span in spans:
         # DEBUG("assign html_figs to span")
