@@ -127,7 +127,7 @@ def add_measurement():
         return 'ERR_INVALID_API_KEY'
     # insert value only every half an hour to db
     now = datetime.datetime.now()
-    if (now.minute == 0 or now.minute > 30) and (now.second > 55.0 or now.second <= 5.0):
+    if (now.minute == 0 or now.minute == 30) and now.second >= 0.0 and now.second < 10.0:
         DEBUG("posting values to db...")
         db = get_db()
         temperature = float(request.json['temperature'])
