@@ -1,23 +1,27 @@
+import datetime
 import os
 import sqlite3
 import time
 from copy import deepcopy
-import datetime
 from multiprocessing import Process, Manager  # create plots in background
-import user_defines
 
 from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash, jsonify
-# from flask_socketio import SocketIO, send, emit
 
+import user_defines
 from plot_collection import *
 from utils import *
+
+# from flask_socketio import SocketIO, send, emit
+
+EXTENSION_ESP32_1_TABLE_NAME = "'homesens-extension-esp32-1'"
 
 
 def create_app():
     return Flask(__name__)
 
-#app = create_app()
+
+# app = create_app()
 
 app = Flask(__name__)
 
@@ -32,17 +36,18 @@ app.config.update(dict(
     SECRET_KEY='development-key',
     USERNAME='admin',
     PASSWORD='default',
-    PLOT_CYCLE_TIME=30*30
+    PLOT_CYCLE_TIME=30 * 30
 ))
 app.config.from_envvar('HOMESENS_SETTINGS', silent=True)
 
-#socketio = SocketIO(app)
-#if __name__ == "__main__":
-    #socketio.run(app)
+
+# socketio = SocketIO(app)
+# if __name__ == "__main__":
+# socketio.run(app)
 
 
-#@socketio.on('message')
-#def handle_message(data):
+# @socketio.on('message')
+# def handle_message(data):
 #    print('received message: ' + data)
 #    send("greetings from homesens")
 
@@ -117,7 +122,8 @@ def index():
     DEBUG("Content of html_figs " + str(namespace.html_figs.keys()))
     # DEBUG(html_figs)
     # print(namespace.html_figs)
-    return render_template('show_entries.html', entries=entries, html_figs=namespace.html_figs, esp_32_1_entries=esp_32_1_entries)
+    return render_template('show_entries.html', entries=entries, html_figs=namespace.html_figs,
+                           esp_32_1_entries=esp_32_1_entries)
 
 
 @app.route('/post-measurement', methods=['POST'])
@@ -125,36 +131,37 @@ def add_measurement():
     DEBUG(request.json)
     if request.json['api_key'] != user_defines.EXTENSION_API_KEY:
         return 'ERR_INVALID_API_KEY'
-    # insert value only every half an hour to db
+    # insert value only at specific times
     now = datetime.datetime.now()
-    sel_minutes = [10*x for x in range(6)]
+    sel_minutes = [10 * x for x in range(6)]
     if now.minute in sel_minutes and now.second >= 0.0 and now.second < 10.0:
         DEBUG("posting values to db...")
         db = get_db()
         temperature = float(request.json['temperature'])
         pressure = float(request.json['pressure'])
         humidity = float(request.json['humidity'])
-        insert_measurement_into_db(db, "'homesens-extension-esp32-1'", temperature, pressure, humidity)
+        insert_measurement_into_db(db, EXTENSION_ESP32_1_TABLE_NAME, temperature, pressure, humidity)
     else:
         DEBUG("ignoring measurements " + str(now) + str(now.second))
     return 'OK'
 
 
 def insert_measurement_into_db(db, table_name, temperature, pressure, humidity):
-    db.execute('insert into {table_name} (temperature, pressure, humidity) values (?, ?, ?)'.format(table_name=table_name),
-                 [temperature, pressure, humidity])
+    db.execute(
+        'insert into {table_name} (temperature, pressure, humidity) values (?, ?, ?)'.format(table_name=table_name),
+        [temperature, pressure, humidity])
     db.commit()
     print('New entry was successfully posted\n'
-		'values are (temp, press, humid): %.2f, %.2f, %.2f' % (temperature, pressure, humidity))
+          'values are (temp, press, humid): %.2f, %.2f, %.2f' % (temperature, pressure, humidity))
 
 
 @app.route('/get-status-update', methods=['GET'])
 def get_updated_status():
-    #DEBUG("request params: " + str(request.args))
+    # DEBUG("request params: " + str(request.args))
     if request.args.get('api_key') != user_defines.EXTENSION_API_KEY:
         return 'ERR_INVALID_API_KEY'
     status = jsonify(command_1=1.0, command_2=2.0)
-    #DEBUG('response: ' + str(status.data))
+    # DEBUG('response: ' + str(status.data))
     return status
 
 
@@ -198,18 +205,17 @@ def create_plots(spans, html_figs):
         # timestamp is in UTC, convert to CET
         cur = db.execute(
             'select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from entries order by id desc')
-        entries = cur.fetchall() # TODO fetch only max 1 year back
+        entries = cur.fetchall()  # TODO fetch only max 1 year back
+
+        cur = db.execute(
+            "select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from {table_name} order by id desc".format(
+                table_name=EXTENSION_ESP32_1_TABLE_NAME))
+        esp32_1_entries = cur.fetchall()  # TODO fetch only max 1 year back
 
     for span in spans:
         # DEBUG("assign html_figs to span")
-        html_figs[span] = deepcopy(plot_plotly(entries, span))
-
-
-# html_figs[span] = 1
-# DEBUG("keys: " + str(html_figs.keys()))
-
-
-# DEBUG("html_figs keys: " + str(html_figs.keys()))
+        data_list = [entries, esp32_1_entries]
+        html_figs[span] = deepcopy(plot_plotly(data_list, span))
 
 
 def create_plots_routine(spans, interval, html_figs):

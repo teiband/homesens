@@ -39,33 +39,41 @@ def select_data_span(data, span):
     return data_span
 
 
-def plot_plotly(data, span):
+def plot_plotly(data_list, span):
     DEBUG("plotting for span: " + span)
-    data = select_data_span(data, span)
-    data = np.array(data)
-    data = np.flipud(data)  # entries come in reversed order
-    # t_str = [entry[0] for entry in data]
+    data_frames = []
+    for data in data_list:
+        data = select_data_span(data, span)
+        data = np.array(data)
+        data = np.flipud(data)  # entries come in reversed order
 
-    df = pandas.DataFrame(data[:, 1:], index=data[:, 0], columns=['temp', 'press', 'humid'])
-    df.temp.label = "Temp. in C°"
-    df.press.label = "Press. in hPa"
-    df.humid.label = "Humid. in % rel."
+        df = pandas.DataFrame(data[:, 1:], index=data[:, 0], columns=['temp', 'press', 'humid'])
+        df.temp.label = "Temp. in C°"
+        df.press.label = "Press. in hPa"
+        df.humid.label = "Humid. in % rel."
 
-    def get_ref_plot_values(df, ref_value):
-        refs = [[df.index[0], df.index[-1]], [ref_value, ref_value]]
-        return refs
+        def get_ref_plot_values(df, ref_value):
+            refs = [[df.index[0], df.index[-1]], [ref_value, ref_value]]
+            return refs
 
-    df.temp.ref = 20.0
-    df.press.ref = 950.0
-    df.humid.ref = 60.0
+        df.temp.ref = 20.0
+        df.press.ref = 950.0
+        df.humid.ref = 60.0
+        data_frames.append(df)
+
+    data_frames[0].name = ''
+    data_frames[1].name = ' (ESP32-1)'
 
     html_fig = {}  # contains three plots for all variables
 
-    for label, content in df.iteritems():
+    for label, content in data_frames[-1].iteritems():
         ref_values = get_ref_plot_values(df, content.ref)
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=ref_values[0], y=ref_values[1], name='ref.', line_color='grey'))  # fill to trace0 y
-        fig.add_trace(go.Scatter(x=df.index, y=content, fill='tonexty', name=content.label))
+        for df in data_frames:
+            fig.add_trace(
+                go.Scatter(x=df.index, y=content, name=content.label + df.name))  # TODO check:, fill='tonexty'
+
         set_plotly_fig_style(fig)
         # fig.show()
         html_fig[label] = fig.to_html(include_plotlyjs=False)
