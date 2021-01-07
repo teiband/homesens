@@ -1,6 +1,7 @@
-cd homesens
 source venv/bin/activate
-export FLASK_APP=~/workspace/homesens/homesens/homesens.py
+cd homesens
+export FLASK_APP=homesens.py
 export FLASK_ENV=development
 # flask run
-flask run --host=0.0.0.0
+# flask run --host=0.0.0.0
+python -m flask run --host=0.0.0.0
