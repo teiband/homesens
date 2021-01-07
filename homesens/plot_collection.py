@@ -23,7 +23,7 @@ def select_data_span(df, span):
     earliest_date = str(datetime.now() - delta)
     #print("df.index > earliest_date", (df.index > earliest_date))
     df = df[df.index > earliest_date]
-    # print('span:', span, 'earliest date:', earliest_date) #, 'earliest:', df[0], 'last:', df[-1], 'count:', len(df))
+    #print('span:', span, 'earliest date:', earliest_date, 'count:', len(df), 'earliest:', df.index[0], 'last:', df.index[-1])
     return df
 
 
@@ -58,24 +58,23 @@ def plot_plotly(data_list, span):
 
     html_fig = {}  # contains three plots for all variables
 
-    for label, content in data_frames[-1].iteritems():
-        ref_values = get_ref_plot_values(df, content.ref)
+
+    # iterate over data columns (temp, press, humid)
+    for label in data_frames[0].keys():
+        # create one reference line from first dataframe
+        content = getattr(data_frames[0], label)
+        ref_values = get_ref_plot_values(data_frames[0], content.ref)
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=ref_values[0], y=ref_values[1], name='ref.', line_color='grey'))  # fill to trace0 y
+        # create plot for each dataframe
         for df in data_frames:
             fig.add_trace(
-                go.Scatter(x=df.index, y=content, name=content.label + df.name))  # TODO check:, fill='tonexty'
+                go.Scatter(x=df.index, y=df[label], name=content.label + df.name ))
 
         set_plotly_fig_style(fig)
         # fig.show()
         html_fig[label] = fig.to_html(include_plotlyjs=False)
-        # with open('debug.html', 'w') as f:
-        #    f.write(html_fig[label])
-        # The following could reduce plot size compared to plotly html strings:
-        # img = io.BytesIO()
-        # fig.write_image(img)
-        # base64_str = fig_to_base64(img)
-        # html_fig[label] = base64_to_html_fig(base64_str)
+
     DEBUG("html figure size (Mb): " + str(len(html_fig[label]) * 16 / 1024 ** 2))
     return html_fig
 
