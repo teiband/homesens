@@ -207,13 +207,13 @@ def create_plots(spans, html_figs):
         db = get_db()
         # timestamp is in UTC, convert to CET
         cur = db.execute(
-            'select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from entries order by id desc')
+            'select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from entries order by id asc')
         entries = cur.fetchall()  # TODO fetch only max 1 year back
         if len(entries) == 0:
             raise ValueError("Table has no entries: " + "entries")
 
         cur = db.execute(
-            "select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from {table_name} order by id desc".format(
+            "select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from {table_name} order by id asc".format(
                 table_name=EXTENSION_ESP32_1_TABLE_NAME))
         esp32_1_entries = cur.fetchall()  # TODO fetch only max 1 year back
         if len(esp32_1_entries) == 0:

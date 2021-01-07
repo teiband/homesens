@@ -5,49 +5,41 @@ import numpy as np
 import plotly.graph_objects as go
 import pandas
 import base64
+from datetime import datetime, timedelta
 
 from utils import *
 
 
-# TMP_FILENAME_PREFIX = 'homesens/static/images/tmp_plot_collection'
-# TMP_FILENAME_EXT = '.png'
-
-
-def select_data_span(data, span):
-    spans = np.array([24, 24 * 7, 24 * 30, 24 * 365])  # available time spans for day/week/month/year
-    # now we have a measurement every half hour
-    spans = 2 * spans
-
-    data_span = []
-    end_idx = None
-
-    # print 'selected time span:', span
+def select_data_span(df, span):
     if span == 'day':
-        end_idx = spans[0]
+        delta = timedelta(days=1)
     elif span == 'week':
-        end_idx = spans[1]
+        delta = timedelta(days=7)
     elif span == 'month':
-        end_idx = spans[2]
+        delta = timedelta(days=31)
     elif span == 'year':
-        end_idx = spans[3]
+        delta = timedelta(days=365)
 
-    if len(data) >= end_idx:
-        data_span = (data[:end_idx])
-    else:
-        data_span = data
-
-    return data_span
+    earliest_date = str(datetime.now() - delta)
+    #print("df.index > earliest_date", (df.index > earliest_date))
+    df = df[df.index > earliest_date]
+    # print('span:', span, 'earliest date:', earliest_date) #, 'earliest:', df[0], 'last:', df[-1], 'count:', len(df))
+    return df
 
 
 def plot_plotly(data_list, span):
     DEBUG("plotting for span: " + span)
     data_frames = []
     for data in data_list:
-        data = select_data_span(data, span)
+        #data = select_data_span(data, span)
         data = np.array(data)
-        data = np.flipud(data)  # entries come in reversed order
+        if data.ndim == 1:
+            data = data[np.newaxis, ...]
+        #data = np.flipud(data)  # entries come in reversed order
 
         df = pandas.DataFrame(data[:, 1:], index=data[:, 0], columns=['temp', 'press', 'humid'])
+        df = select_data_span(df, span)
+
         df.temp.label = "Temp. in C°"
         df.press.label = "Press. in hPa"
         df.humid.label = "Humid. in % rel."
