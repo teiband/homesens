@@ -2,11 +2,14 @@ import datetime
 import os
 import sqlite3
 import time
+import copy
 from copy import deepcopy
 from multiprocessing import Process, Manager  # create plots in background
 
 from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash, jsonify
+
+print(os.getcwd())
 
 import user_defines
 from plot_collection import *
@@ -206,11 +209,17 @@ def create_plots(spans, html_figs):
         cur = db.execute(
             'select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from entries order by id desc')
         entries = cur.fetchall()  # TODO fetch only max 1 year back
+        if len(entries) == 0:
+            raise ValueError("Table has no entries: " + "entries")
 
         cur = db.execute(
             "select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from {table_name} order by id desc".format(
                 table_name=EXTENSION_ESP32_1_TABLE_NAME))
         esp32_1_entries = cur.fetchall()  # TODO fetch only max 1 year back
+        if len(esp32_1_entries) == 0:
+            #raise ValueError("Table has no entries: " + EXTENSION_ESP32_1_TABLE_NAME)
+            # add single dummy entry for bootstrapping
+            esp32_1_entries = copy.copy(entries)
 
     for span in spans:
         # DEBUG("assign html_figs to span")
