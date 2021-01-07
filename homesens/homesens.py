@@ -135,7 +135,7 @@ def add_measurement():
     if request.json['api_key'] != user_defines.EXTENSION_API_KEY:
         return 'ERR_INVALID_API_KEY'
     # insert value only at specific times
-    now = datetime.datetime.now()
+    now = datetime.now()
     sel_minutes = [10 * x for x in range(6)]
     if now.minute in sel_minutes and now.second >= 0.0 and now.second < 10.0:
         DEBUG("posting values to db...")
