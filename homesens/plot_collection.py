@@ -61,13 +61,17 @@ def plot_plotly(data_list, span):
 
     # iterate over data columns (temp, press, humid)
     for label in data_frames[0].keys():
-        # create one reference line from first dataframe
-        content = getattr(data_frames[0], label)
-        ref_values = get_ref_plot_values(data_frames[0], content.ref)
         fig = go.Figure()
-        fig.add_trace(go.Scatter(x=ref_values[0], y=ref_values[1], name='ref.', line_color='grey'))  # fill to trace0 y
         # create plot for each dataframe
+        # iterate over sensors
+        has_ref_values = False
         for df in data_frames:
+            content = getattr(df, label)
+            if len(df) > 0 and not has_ref_values:
+                # create one reference line from first dataframe
+                ref_values = get_ref_plot_values(df, content.ref)
+                fig.add_trace(go.Scatter(x=ref_values[0], y=ref_values[1], name='ref.', line_color='grey'))  # fill to trace0 y
+                has_ref_values = True
             fig.add_trace(
                 go.Scatter(x=df.index, y=df[label], name=content.label + df.name ))
 
