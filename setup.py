@@ -6,7 +6,8 @@ setup(
     include_package_data=True,
     install_requires=[
         'homesens',
-        'matplotlib',
+        'plotly',
+        'Flask'
     ],
     setup_requires=[
         'pytest-runner',
