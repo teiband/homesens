@@ -9,6 +9,8 @@ from multiprocessing import Process, Manager  # create plots in background
 from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash, jsonify
 
+from asist_tools import convert_currency_page
+
 print(os.getcwd())
 
 import user_defines
@@ -27,6 +29,7 @@ def create_app():
 # app = create_app()
 
 app = Flask(__name__)
+app.register_blueprint(convert_currency_page)
 
 app.config.from_object(__name__)  # load config from this file
 # app.run(host='0.0.0.s0') # run puplic availabe over the network, this is unsecure!!!
