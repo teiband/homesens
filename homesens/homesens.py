@@ -39,7 +39,7 @@ app.config.update(dict(
     SECRET_KEY='development-key',
     USERNAME='admin',
     PASSWORD='default',
-    PLOT_CYCLE_TIME=30 * 30
+    PLOT_CYCLE_TIME=60 * 2
 ))
 app.config.from_envvar('HOMESENS_SETTINGS', silent=True)
 
