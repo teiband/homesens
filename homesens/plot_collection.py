@@ -1,6 +1,5 @@
-import matplotlib
-
-matplotlib.use('Agg')  # run matplotlib headless (for virtualenv)
+#import matplotlib
+#matplotlib.use('Agg')  # run matplotlib headless (for virtualenv)
 import numpy as np
 import plotly.graph_objects as go
 import pandas
