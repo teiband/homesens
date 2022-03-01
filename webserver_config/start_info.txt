@@ -1,3 +1,6 @@
 # start with root privileges in order to use port 80
 # e.g. port 8000 can be used without root
 sudo uwsgi uwsgi.ini
+
+# Restarting the installed service:
+sudo systemctl restart homesens.uwsgi.service
