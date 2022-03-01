@@ -1,11 +1,12 @@
+import copy
 import datetime
 import os
 import sqlite3
 import time
-import copy
 from copy import deepcopy
 from multiprocessing import Process, Manager  # create plots in background
 
+import schedule as schedule
 from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash, jsonify
 
@@ -34,7 +35,8 @@ app.register_blueprint(convert_currency_page)
 app.config.from_object(__name__)  # load config from this file
 # app.run(host='0.0.0.s0') # run puplic availabe over the network, this is unsecure!!!
 
-plot_background_process = None  # This process is created later and shut down when the app crashes
+background_process_list = []
+# plot_background_process = None  # This process is created later and shut down when the app crashes
 
 # Load default config and override config from an environment variable
 app.config.update(dict(
@@ -42,7 +44,7 @@ app.config.update(dict(
     SECRET_KEY='development-key',
     USERNAME='admin',
     PASSWORD='default',
-    PLOT_CYCLE_TIME=60 * 2
+    PLOT_CYCLE_TIME=60 * 5
 ))
 app.config.from_envvar('HOMESENS_SETTINGS', silent=True)
 
@@ -80,9 +82,13 @@ def close_db(error):
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
 
-    if plot_background_process:
-        plot_background_process.terminate()
-        plot_background_process.join()
+
+# @app.teardown_appcontext
+def terminate_background_processes(error):
+    for p in background_process_list:
+        print(f"Terminating process: {p.name}...")
+        p.terminate()
+        p.join()
 
 
 def init_db():
@@ -220,7 +226,7 @@ def create_plots(spans, html_figs):
                 table_name=EXTENSION_ESP32_1_TABLE_NAME))
         esp32_1_entries = cur.fetchall()  # TODO fetch only max 1 year back
         if len(esp32_1_entries) == 0:
-            #raise ValueError("Table has no entries: " + EXTENSION_ESP32_1_TABLE_NAME)
+            # raise ValueError("Table has no entries: " + EXTENSION_ESP32_1_TABLE_NAME)
             # add single dummy entry for bootstrapping
             esp32_1_entries = copy.copy(entries)
 
@@ -233,18 +239,40 @@ def create_plots(spans, html_figs):
 def create_plots_routine(spans, interval, html_figs):
     DEBUG("started.")
     while True:
-        DEBUG("Creating all plots...")
+        DEBUG(f"Creating plots for {spans} ...")
         create_plots(spans, html_figs)
         DEBUG("sleeping...")
         time.sleep(interval)
 
 
+def create_plots_time_scheduled(spans, daytime, html_figs):
+    """
+    Runs a job at the specified daytime
+    :param spans: list of time spans, e.g. ['day', 'week', 'month', 'year']
+    :param daytime: string for daytime, e.g. "06:00"
+    :param html_figs: list holding html figures
+    """
+    # Create plots once on startup, then only at scheduled time
+    create_plots(spans, html_figs)
+    schedule.every().day.at(daytime).do(create_plots, spans, html_figs)
+    while True:
+        schedule.run_pending()
+        time.sleep(60)  # wait one minute
+
+
 def spawn_background_threads(html_figs):
     spans = ['day', 'week', 'month', 'year']
     interval = float(app.config['PLOT_CYCLE_TIME'])
-    plot_background_process = Process(target=create_plots_routine, args=(spans, interval, html_figs))
-    plot_background_process.start()
-    # plot_background_process.join()
+    p_all = Process(target=create_plots_routine, args=(spans, interval, html_figs))
+    # p_day = Process(target=create_plots_routine, args=(['day'], interval, html_figs))
+    # p_week = Process(target=create_plots_time_scheduled, args=(['week', 'month', 'year'], "06:00", html_figs))
+    background_process_list.append(p_all)
+    # background_process_list.append(p_day)
+    # background_process_list.append(p_week)
+
+    for p in background_process_list:
+        print(f"Starting background process: {p.name} ...")
+        p.start()
 
 
 background_plot_manager = Manager()
