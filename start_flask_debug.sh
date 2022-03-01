@@ -1,3 +1,4 @@
+#!/bin/bash
 source venv/bin/activate
 cd homesens
 export FLASK_APP=homesens.py

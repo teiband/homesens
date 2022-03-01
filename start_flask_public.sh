@@ -1,3 +1,4 @@
+#!/bin/bash
 . venv/bin/activate
 cd homesens
 export FLASK_APP=~/workspace/homesens/homesens/homesens.py
