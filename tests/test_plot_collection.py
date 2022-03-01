@@ -36,7 +36,7 @@ def test_plot_collection(db_entries):
 	#spans = ['day', 'week', 'month', 'year']
 	spans = ['day']
 	for span in spans:
-		plot_plotly(entries, span)
+		plot_plotly(db_entries, span)
 
 
 if __name__ == '__main__':
