@@ -1,5 +1,4 @@
-from flask import Flask, render_template, request, Markup, Blueprint
-from asist.tools import convert_all_prices_to_currency
+from flask import Flask, render_template, request, Blueprint
 import finnhub
 
 convert_currency_page = Blueprint('convert_currency', __name__, template_folder='templates')
