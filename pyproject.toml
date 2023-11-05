@@ -8,6 +8,13 @@ authors = ["Thomas Eiband"]
 python = "^3.9"
 Flask = "^3.0.0"
 plotly = "^5.18.0"
+schedule = "^1.2.1"
+finnhub-python = "^2.4.19"
+pandas = "^2.1.2"
+
+[tool.poetry.dependencies.numpy]
+version = "1.26.1"
+python =  ">=3.9,<3.13"
 
 [tool.poetry.dev-dependencies]
 pytest = "^7.4.3"
