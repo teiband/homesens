@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "homesens"
+version = "0.3.0"
+description = "Dashboard and management for sensors"
+authors = ["Thomas Eiband"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Flask = "^3.0.0"
+plotly = "^5.18.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^7.4.3"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
