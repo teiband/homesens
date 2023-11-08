@@ -1,6 +1,6 @@
 import pytest
 import os
-from homesens.homesens import create_plots, get_db, app, connect_db
+from homesens import create_plots, get_db, app, connect_db
 
 
 def test_db(client):
