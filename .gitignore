@@ -109,5 +109,5 @@ Pipfile.lock
 
 # homesens
 homesens/user_defines.py
+/.idea
 poetry.lock
-.idea/
