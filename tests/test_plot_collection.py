@@ -1,9 +1,9 @@
 import os
 #os.environ['PYTHONPATH'] = '$PYTHONPATH:/home/pi/workspace/homesens-devel/'
 os.chdir('../')
-import homesens.plot_collection as plot_collection
+import plot_collection as plot_collection
 import pickle
-from homesens.homesens import *
+from homesens import *
 import pytest
 
 
