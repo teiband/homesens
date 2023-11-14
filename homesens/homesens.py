@@ -9,6 +9,7 @@ from multiprocessing import Process, Manager  # create plots in background
 import schedule as schedule
 from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash, jsonify
+from flask_basicauth import BasicAuth
 
 from asist_tools import convert_currency_page
 
@@ -48,16 +49,10 @@ app.config.update(dict(
 ))
 app.config.from_envvar('HOMESENS_SETTINGS', silent=True)
 
+app.config['BASIC_AUTH_USERNAME'] = user_defines.BASIC_AUTH_USERNAME
+app.config['BASIC_AUTH_PASSWORD'] = user_defines.BASIC_AUTH_PASSWORD
 
-# socketio = SocketIO(app)
-# if __name__ == "__main__":
-# socketio.run(app)
-
-
-# @socketio.on('message')
-# def handle_message(data):
-#    print('received message: ' + data)
-#    send("greetings from homesens")
+basic_auth = BasicAuth(app)
 
 
 def connect_db():
@@ -119,6 +114,7 @@ def UTC2CET(utc_timestamp):
 
 
 @app.route('/')
+@basic_auth.required
 def index():
     db = get_db()
     # timestamp is in UTC, convert to CET
