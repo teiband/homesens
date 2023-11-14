@@ -2,7 +2,7 @@ import pytest
 import os
 import sqlite3
 
-from homesens import homesens
+import homesens
 
 
 @pytest.fixture
