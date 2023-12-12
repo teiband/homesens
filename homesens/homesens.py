@@ -11,13 +11,13 @@ from flask import Flask, request, session, g, redirect, url_for, abort, \
     render_template, flash, jsonify
 from flask_basicauth import BasicAuth
 
-from asist_tools import convert_currency_page
+from homesens.asist_tools import convert_currency_page
 
 print(os.getcwd())
 
-import user_defines
-from plot_collection import *
-from utils import *
+import homesens.user_defines
+from homesens.plot_collection import *
+from homesens.utils import *
 
 # from flask_socketio import SocketIO, send, emit
 
@@ -49,8 +49,8 @@ app.config.update(dict(
 ))
 app.config.from_envvar('HOMESENS_SETTINGS', silent=True)
 
-app.config['BASIC_AUTH_USERNAME'] = user_defines.BASIC_AUTH_USERNAME
-app.config['BASIC_AUTH_PASSWORD'] = user_defines.BASIC_AUTH_PASSWORD
+app.config['BASIC_AUTH_USERNAME'] = homesens.user_defines.BASIC_AUTH_USERNAME
+app.config['BASIC_AUTH_PASSWORD'] = homesens.user_defines.BASIC_AUTH_PASSWORD
 
 basic_auth = BasicAuth(app)
 
@@ -137,7 +137,7 @@ def index():
 @app.route('/post-measurement', methods=['POST'])
 def add_measurement():
     DEBUG(request.json)
-    if request.json['api_key'] != user_defines.EXTENSION_API_KEY:
+    if request.json['api_key'] != homesens.user_defines.EXTENSION_API_KEY:
         return 'ERR_INVALID_API_KEY'
     # insert value only at specific times
     now = datetime.now()
@@ -166,7 +166,7 @@ def insert_measurement_into_db(db, table_name, temperature, pressure, humidity):
 @app.route('/get-status-update', methods=['GET'])
 def get_updated_status():
     # DEBUG("request params: " + str(request.args))
-    if request.args.get('api_key') != user_defines.EXTENSION_API_KEY:
+    if request.args.get('api_key') != homesens.user_defines.EXTENSION_API_KEY:
         return 'ERR_INVALID_API_KEY'
     status = jsonify(command_1=1.0, command_2=2.0)
     # DEBUG('response: ' + str(status.data))

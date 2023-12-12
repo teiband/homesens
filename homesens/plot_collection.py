@@ -6,7 +6,7 @@ import pandas
 import base64
 from datetime import datetime, timedelta
 
-from utils import *
+from homesens.utils import *
 
 
 def select_data_span(df, span):
