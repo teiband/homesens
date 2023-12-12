@@ -1,1 +1,1 @@
-uwsgi uwsgi.ini
+sudo uwsgi uwsgi.ini
