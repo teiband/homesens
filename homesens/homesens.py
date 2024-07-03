@@ -201,7 +201,7 @@ def login_old():
             return redirect(url_for('show_entries'))
     return render_template('login.html', error=error)
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['POST'])
 def login():
     if (request.form['password'] == homesens.user_defines.BASIC_AUTH_PASSWORD and
             request.form['username'] == homesens.user_defines.BASIC_AUTH_USERNAME):
