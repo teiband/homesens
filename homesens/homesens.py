@@ -114,24 +114,26 @@ def UTC2CET(utc_timestamp):
 
 
 @app.route('/')
-@basic_auth.required
 def index():
-    db = get_db()
-    # timestamp is in UTC, convert to CET
-    cur = db.execute(
-        "select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from entries order by id desc")
-    entries = cur.fetchmany(20)
-    spans = ['day', 'week', 'month', 'year']
+    if not session.get('logged_in'):
+        return render_template('login.html')
+    else:
+        db = get_db()
+        # timestamp is in UTC, convert to CET
+        cur = db.execute(
+            "select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from entries order by id desc")
+        entries = cur.fetchmany(20)
+        spans = ['day', 'week', 'month', 'year']
 
-    cur = db.execute(
-        "select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from 'homesens-extension-esp32-1' order by id desc")
-    esp_32_1_entries = cur.fetchmany(20)
+        cur = db.execute(
+            "select datetime (timestamp,\'localtime\'), temperature, pressure, humidity from 'homesens-extension-esp32-1' order by id desc")
+        esp_32_1_entries = cur.fetchmany(20)
 
-    DEBUG("Content of html_figs " + str(namespace.html_figs.keys()))
-    # DEBUG(html_figs)
-    # print(namespace.html_figs)
-    return render_template('show_entries.html', entries=entries, html_figs=namespace.html_figs,
-                           esp_32_1_entries=esp_32_1_entries)
+        DEBUG("Content of html_figs " + str(namespace.html_figs.keys()))
+        # DEBUG(html_figs)
+        # print(namespace.html_figs)
+        return render_template('show_entries.html', entries=entries, html_figs=namespace.html_figs,
+                               esp_32_1_entries=esp_32_1_entries)
 
 
 @app.route('/post-measurement', methods=['POST'])
@@ -185,8 +187,8 @@ def add_entry():
     return redirect(url_for('show_entries'))
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/login_old', methods=['GET', 'POST'])
+def login_old():
     error = None
     if request.method == 'POST':
         if request.form['username'] != app.config['USERNAME']:
@@ -199,12 +201,21 @@ def login():
             return redirect(url_for('show_entries'))
     return render_template('login.html', error=error)
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if (request.form['password'] == homesens.user_defines.BASIC_AUTH_PASSWORD and
+            request.form['username'] == homesens.user_defines.BASIC_AUTH_USERNAME):
+        session['logged_in'] = True
+    else:
+        flash('Wrong username or password!')
+    return index()
+
 
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
-    return redirect(url_for('show_entries'))
+    return redirect(url_for('index'))
 
 
 def create_plots(spans, html_figs):
