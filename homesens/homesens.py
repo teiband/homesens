@@ -186,8 +186,9 @@ def add_entry():
     flash('New entry was successfully posted')
     return redirect(url_for('show_entries'))
 
+<< << << < HEAD
 
-<<<<<<< HEAD
+
 @app.route('/login_old', methods=['GET', 'POST'])
 def login_old():
     error = None
@@ -202,10 +203,8 @@ def login_old():
             return redirect(url_for('show_entries'))
     return render_template('login.html', error=error)
 
-@app.route('/login', methods=['POST'])
-=======
+
 @app.route('/login', methods=['GET', 'POST'])
->>>>>>> f77d6538c3907ed5cd554050c25ce32328d6c683
 def login():
     if (request.form['password'] == homesens.user_defines.BASIC_AUTH_PASSWORD and
             request.form['username'] == homesens.user_defines.BASIC_AUTH_USERNAME):
